@@ -1,4 +1,4 @@
-# EphemerisCanlendarImport
+# EphemerisCalendarImport
 import the school holiday calendar of Schulferien.org
 
 The script imports the data from the school calendar files for your state into a xml-file readable by the Ephedermis action.
