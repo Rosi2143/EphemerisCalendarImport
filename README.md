@@ -5,7 +5,7 @@ The script imports the data from the school calendar files for your state into a
 ## get the calendars
 Calendars for German school holidays are centrally provided by [schulferien.org](https://www.schulferien.org/deutschland/ferien/).
 
-Just download the calendar for your state and store it. You can download as many calendars as you want.
+Just download the calendar for your state **[from here](https://www.schulferien.org/deutschland/ical/)** and store it. You can download as many calendars as you want.
 
 ## usage
 * put all calendar files into one folder
