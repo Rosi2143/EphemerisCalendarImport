@@ -10,6 +10,9 @@ import datetime
 import glob
 import argparse
 import os
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 OpenHabConf = "/etc/openhab2/"
 try:
