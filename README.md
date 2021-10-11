@@ -7,6 +7,23 @@ Calendars for German school holidays are centrally provided by [schulferien.org]
 
 Just download the calendar for your state **[from here](https://www.schulferien.org/deutschland/ical/)** and store it. You can download as many calendars as you want.
 
+## Preconditions
+
+### python 2.7.x
+install [python 2.7](https://www.python.org/downloads/)
+
+### install icalendar
+The script depends on the [icalendar package](https://pypi.org/project/icalendar/)
+Run this command to install it
+
+```
+pip install icalendar
+```
+or
+```
+python2 -m pip install icalendar
+```
+
 ## usage
 * put all calendar files into one folder
   * default is **$OPENHAB_CONF/scripts**
