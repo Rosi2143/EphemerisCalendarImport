@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # see https://pypi.org/project/icalendar/
 # get calendars for Germany from https://www.schulferien.org/deutschland/ical/
 
@@ -10,11 +10,8 @@ import datetime
 import glob
 import argparse
 import os
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 
-OpenHabConf = "/etc/openhab2/"
+OpenHabConf = "/etc/openhab/"
 try:
     OpenHabConf = os.environ['OPENHAB_CONF']
 except KeyError:
