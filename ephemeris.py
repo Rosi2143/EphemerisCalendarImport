@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # see https://pypi.org/project/icalendar/
 # get calendars for Germany from https://www.schulferien.org/deutschland/ical/
 
@@ -10,19 +10,16 @@ import datetime
 import glob
 import argparse
 import os
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 
-OpenHabConf = "/etc/openhab2/"
+OpenHabConf = "/etc/openhab/"
 try:
     OpenHabConf = os.environ['OPENHAB_CONF']
 except KeyError:
-    print "No variable OPENHAB_CONF found"
+    print ("No variable OPENHAB_CONF found")
 
 count = 0
 
-parser = argparse.ArgumentParser(description='read school holidays from https://www.schulferien.org/deutschland/ical/')
+parser = argparse.ArgumentParser(description='convert school holidays ICS files from https://www.schulferien.org/deutschland/ical/')
 
 parser.add_argument('-v', '--verbose', action='store_const', const=1, default=0                                                 , help='activate logging')
 parser.add_argument('-i', '--inPath',                                 default=os.path.join(OpenHabConf, "scripts/")             , help='set path where the ics files are')
@@ -59,12 +56,12 @@ def daterange(start_date, end_date):
 
 for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
     if args.verbose > 0:
-        print "parsing file {0}".format(filename)
+        print ("parsing file {0}".format(filename))
     file = open(filename, 'rb')
     cal = Calendar.from_ical(file.read())
 
     if args.verbose > 1:
-        print cal
+        print (cal)
     xmlFileContent += "\t<!-- filename = {file} -->\n".format(file=filename)
 
     for component in cal.walk():
@@ -86,16 +83,16 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                 xmlFileContent += "\t\t<!-- reason = {_summary} -->\n".format(_summary=summary)
                 for single_date in daterange(startdt, enddt):
                     if args.verbose > 0:
-                        print single_date.strftime("%Y-%m-%d")
+                        print (single_date.strftime("%Y-%m-%d"))
                     if args.verbose > 1:
-                        print int(single_date.strftime("%m"))
+                        print (int(single_date.strftime("%m")))
                         month = MONTHS[int(single_date.strftime("%m"))]
-                        print month
+                        print (month)
                         addString = """\t\t<tns:Fixed month=\"{_month}\" """.format(_month=month)
-                        print addString
+                        print (addString)
                     addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" />\n""".format(_month=MONTHS[int(single_date.strftime("%m"))], _day=single_date.strftime("%d"),_summary=summary)
                     if args.verbose > 0:
-                        print addString
+                        print (addString)
                     xmlFileContent += addString
                     count = count + 1
 
