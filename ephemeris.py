@@ -90,7 +90,12 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                         print (month)
                         addString = """\t\t<tns:Fixed month=\"{_month}\" """.format(_month=month)
                         print (addString)
-                    addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" />\n""".format(_month=MONTHS[int(single_date.strftime("%m"))], _day=single_date.strftime("%d"),_summary=summary)
+                    addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" validFrom=\"{_from}\" validTo=\"{_to}\" />\n""".format(
+                        _month=MONTHS[int(single_date.strftime("%m"))], 
+                        _day=single_date.strftime("%d"),
+                        _summary=summary,
+                        _from=single_date.strftime("%Y"),
+                        _to=single_date.strftime("%Y"))
                     if args.verbose > 0:
                         print (addString)
                     xmlFileContent += addString
