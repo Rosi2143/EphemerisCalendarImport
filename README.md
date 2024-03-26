@@ -11,8 +11,8 @@ You can download as many calendars as you want.
 
 ## advantages of this fork
 This fork has the following changes:
-* ported to Pythos 3
-* added the actual *year* to the generated calendar entry (this was missing causing errors and eoverlapping entries when used with multiple years)
+* ported to Python 3
+* added the actual *year* to the generated calendar entry (this was missing, causing errors and overlapping entries when used with multiple years)
 
 ## Preconditions
 
