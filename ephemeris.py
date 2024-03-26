@@ -2,14 +2,13 @@
 # see https://pypi.org/project/icalendar/
 # get calendars for Germany from https://www.schulferien.org/deutschland/ical/
 
-from icalendar import Calendar, Event
 from datetime import date, timedelta, datetime
-
 import calendar
-import datetime
+# import datetime
 import glob
 import argparse
 import os
+from icalendar import Calendar, Event
 
 OpenHabConf = "/etc/openhab/"
 try:
@@ -40,7 +39,7 @@ MONTHS = {1 :'JANUARY'  ,
           9 :'SEPTEMBER',
           10:'OCTOBER'  ,
           11:'NOVEMBER' ,
-          12:'DECEMBER'};
+          12:'DECEMBER'}
 
 xmlFileContent = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -91,7 +90,7 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                         addString = """\t\t<tns:Fixed month=\"{_month}\" """.format(_month=month)
                         print (addString)
                     addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" validFrom=\"{_from}\" validTo=\"{_to}\" />\n""".format(
-                        _month=MONTHS[int(single_date.strftime("%m"))], 
+                        _month=MONTHS[int(single_date.strftime("%m"))],
                         _day=single_date.strftime("%d"),
                         _summary=summary,
                         _from=single_date.strftime("%Y"),
@@ -102,7 +101,7 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                     count = count + 1
 
 xmlFileContent += "\t</tns:Holidays>"
-xmlFileContent += "</tns:Configuration>";
+xmlFileContent += "</tns:Configuration>"
 
 filehandle = open(args.outFile, mode='w')
 filehandle.write(xmlFileContent)
