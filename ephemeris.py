@@ -55,13 +55,13 @@ def daterange(start_date, end_date):
 
 for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
     if args.verbose > 0:
-        print ("parsing file {0}".format(filename))
+        print (f"parsing file {filename}")
     file = open(filename, 'rb')
     cal = Calendar.from_ical(file.read())
 
     if args.verbose > 1:
         print (cal)
-    xmlFileContent += "\t<!-- filename = {file} -->\n".format(file=filename)
+    xmlFileContent += f"\t<!-- filename = {filename} -->\n"
 
     for component in cal.walk():
         if component.name == "VEVENT":
@@ -75,11 +75,11 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                 reoccur = component.get('rrule').to_ical().decode('utf-8')
                 for item in parse_recurrences(reoccur, startdt, exdate):
                     if args.verbose > 0:
-                        print("\t{0} {1}: {2} - {3}".format(item, summary, description, location))
+                        print(f"\t{item} {summary}: {description} - {location}")
             else:
                 if args.verbose > 0:
-                    print("\t{0}-{1} {2}: {3} - {4}".format(startdt.strftime("%D %H:%M UTC"), enddt.strftime("%D %H:%M UTC"), summary, description, location))
-                xmlFileContent += "\t\t<!-- reason = {_summary} -->\n".format(_summary=summary)
+                    print( f"\t{0}-{1} {2}: {3} - {4}".format(startdt.strftime("%D %H:%M UTC"), enddt.strftime("%D %H:%M UTC"), summary, description, location))
+                xmlFileContent += f"\t\t<!-- reason = {summary} -->\n"
                 for single_date in daterange(startdt, enddt):
                     if args.verbose > 0:
                         print (single_date.strftime("%Y-%m-%d"))
@@ -87,7 +87,7 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                         print (int(single_date.strftime("%m")))
                         month = MONTHS[int(single_date.strftime("%m"))]
                         print (month)
-                        addString = """\t\t<tns:Fixed month=\"{_month}\" """.format(_month=month)
+                        addString = f"""\t\t<tns:Fixed month=\"{month}\" """
                         print (addString)
                     addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" validFrom=\"{_from}\" validTo=\"{_to}\" />\n""".format(
                         _month=MONTHS[int(single_date.strftime("%m"))],
@@ -103,7 +103,7 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
 xmlFileContent += "\t</tns:Holidays>"
 xmlFileContent += "</tns:Configuration>"
 
-filehandle = open(args.outFile, mode='w')
+filehandle = open(args.outFile, mode='w', encoding='utf-8')
 filehandle.write(xmlFileContent)
 filehandle.close
 
