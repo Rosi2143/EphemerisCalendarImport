@@ -18,11 +18,11 @@ except KeyError:
 
 count = 0
 
-parser = argparse.ArgumentParser(description='convert school holidays ICS files from https://www.schulferien.org/deutschland/ical/')
+parser = argparse.ArgumentParser(description='Convert school holidays ICS files, e.g. from https://www.schulferien.org/deutschland/ical/')
 
-parser.add_argument('-v', '--verbose', action='store_const', const=1, default=0                                                 , help='activate logging')
-parser.add_argument('-i', '--inPath',                                 default=os.path.join(OpenHabConf, "scripts/")             , help='set path where the ics files are')
-parser.add_argument('-o', '--outFile',                                default=os.path.join(OpenHabConf, "services/holidays.xml"), help='set the out file')
+parser.add_argument('-v', '--verbose', default=0,      action='store_const', const=1            , help='activate logging')
+parser.add_argument('-i', '--inPath' , default=os.path.join(OpenHabConf,"scripts/")             , help='set path where the ics files are')
+parser.add_argument('-o', '--outFile', default=os.path.join(OpenHabConf,"services/holidays.xml"), help='set the out file')
 
 args = parser.parse_args()
 
@@ -50,7 +50,14 @@ xmlFileContent = """\
 """
 
 def daterange(start_date, end_date):
-    for n in range(int ((end_date - start_date).days)):
+    """
+    Generate a range of dates between the start_date and end_date. Args:
+        start_date (datetime.date): The start date of the range.
+        end_date (datetime.date): The end date of the range.
+    Yields:
+        datetime.date: The dates in the range.
+    """
+    for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
 for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
