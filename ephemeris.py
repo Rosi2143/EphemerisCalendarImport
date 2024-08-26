@@ -1,20 +1,20 @@
 #!/usr/bin/python3
-# see https://pypi.org/project/icalendar/
-# get calendars for Germany from https://www.schulferien.org/deutschland/ical/
+""" see https://pypi.org/project/icalendar/
+get calendars for Germany from https://www.schulferien.org/deutschland/ical/
+"""
 
-from datetime import timedelta
+from datetime import timedelta, timezone, datetime
 import glob
 import argparse
 import os
 from icalendar import Calendar
+from dateutil.rrule import rruleset, rrulestr
 
-OpenHabConf = "/etc/openhab/"
+OPENHAB_CONF = "/etc/openhab/"
 try:
-    OpenHabConf = os.environ["OPENHAB_CONF"]
+    OPENHAB_CONF = os.environ["OPENHAB_CONF"]
 except KeyError:
     print("No variable OPENHAB_CONF found")
-
-count = 0
 
 parser = argparse.ArgumentParser(
     description="Convert school holidays ICS files, e.g. from https://www.schulferien.org/deutschland/ical/"
@@ -26,19 +26,19 @@ parser.add_argument(
 parser.add_argument(
     "-i",
     "--inPath",
-    default=os.path.join(OpenHabConf, "scripts/"),
+    default=os.path.join(OPENHAB_CONF, "scripts/"),
     help="set path where the ics files are",
 )
 parser.add_argument(
     "-o",
     "--outFile",
-    default=os.path.join(OpenHabConf, "services/holidays.xml"),
+    default=os.path.join(OPENHAB_CONF, "services/holidays.xml"),
     help="set the out file",
 )
 
 args = parser.parse_args()
 
-FileNameFilter = "*.ics"
+FILE_NAME_FILTER = "*.ics"
 
 MONTHS = {
     1: "JANUARY",
@@ -55,7 +55,7 @@ MONTHS = {
     12: "DECEMBER",
 }
 
-xmlFileContent = """\
+XML_FILE_CONTENT = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <tns:Configuration hierarchy="de" description="Germany"
 \txmlns:tns="http://www.example.org/Holiday" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -76,15 +76,37 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
-for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
+def parse_recurrences(recur_rule, start, exclusions):
+    """Find all reoccuring events"""
+    rules = rruleset()
+    first_rule = rrulestr(recur_rule, dtstart=start)
+    rules.rrule(first_rule)
+    if not isinstance(exclusions, list):
+        exclusions = [exclusions]
+        for xdate in exclusions:
+            try:
+                rules.exdate(xdate.dts[0].dt)
+            except AttributeError:
+                pass
+    now = datetime.now(timezone.utc)
+    this_year = now + timedelta(days=60)
+    dates = []
+    for rule in rules.between(now, this_year):
+        dates.append(rule.strftime("%D %H:%M UTC "))
+    return dates
+
+
+COUNT = 0
+
+for filename in glob.glob(os.path.join(args.inPath, FILE_NAME_FILTER)):
     if args.verbose > 0:
         print(f"parsing file {filename}")
-    file = open(filename, "rb")
-    cal = Calendar.from_ical(file.read())
+    with open(filename, "rb") as ics_file:
+        cal = Calendar.from_ical(ics_file.read())
 
     if args.verbose > 1:
         print(cal)
-    xmlFileContent += f"\t<!-- filename = {filename} -->\n"
+    XML_FILE_CONTENT += f"\t<!-- filename = {filename} -->\n"
 
     for component in cal.walk():
         if component.name == "VEVENT":
@@ -110,7 +132,7 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                             location,
                         )
                     )
-                xmlFileContent += f"\t\t<!-- reason = {summary} -->\n"
+                XML_FILE_CONTENT += f"\t\t<!-- reason = {summary} -->\n"
                 for single_date in daterange(startdt, enddt):
                     if args.verbose > 0:
                         print(single_date.strftime("%Y-%m-%d"))
@@ -120,23 +142,16 @@ for filename in glob.glob(os.path.join(args.inPath, FileNameFilter)):
                         print(month)
                         addString = f"""\t\t<tns:Fixed month=\"{month}\" """
                         print(addString)
-                    addString = """\t\t<tns:Fixed month=\"{_month}\" day=\"{_day}\" descriptionPropertiesKey=\"{_summary}\" validFrom=\"{_from}\" validTo=\"{_to}\" />\n""".format(
-                        _month=MONTHS[int(single_date.strftime("%m"))],
-                        _day=single_date.strftime("%d"),
-                        _summary=summary,
-                        _from=single_date.strftime("%Y"),
-                        _to=single_date.strftime("%Y"),
-                    )
+                    addString = f"\t\t<tns:Fixed month=\"{MONTHS[int(single_date.strftime('%m'))]}\" day=\"{single_date.strftime('%d')}\" descriptionPropertiesKey=\"{summary}\" validFrom=\"{single_date.strftime('%Y')}\" validTo=\"{single_date.strftime('%Y')}\" />\n"
                     if args.verbose > 0:
                         print(addString)
-                    xmlFileContent += addString
-                    count = count + 1
+                    XML_FILE_CONTENT += addString
+                    COUNT += 1
 
-xmlFileContent += "\t</tns:Holidays>"
-xmlFileContent += "</tns:Configuration>"
+XML_FILE_CONTENT += "\t</tns:Holidays>"
+XML_FILE_CONTENT += "</tns:Configuration>"
 
-filehandle = open(args.outFile, mode="w", encoding="utf-8")
-filehandle.write(xmlFileContent)
-filehandle.close
+with open(args.outFile, mode="w", encoding="utf-8") as out_file:
+    out_file.write(XML_FILE_CONTENT)
 
-print("Added %d items to file %s" % (count, args.outFile))
+print(f"Added {COUNT} items to file {args.outFile}")
