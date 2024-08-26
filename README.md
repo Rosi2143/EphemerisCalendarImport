@@ -6,13 +6,8 @@ The script imports the data from the school calendar files for your state into a
 ## get the calendars
 Calendars for German school holidays are centrally provided by [schulferien.org](https://www.schulferien.org/deutschland/ferien/).
 
-Just download the calendar for your state **[from here](https://www.schulferien.org/deutschland/ical/)** and store it. 
+Just download the calendar for your state **[from here](https://www.schulferien.org/deutschland/ical/)** and store it.
 You can download as many calendars as you want.
-
-## advantages of this fork
-This fork has the following changes:
-* ported to Python 3
-* added the actual *year* to the generated calendar entry (this was missing, causing errors and overlapping entries when used with multiple years)
 
 ## Preconditions
 
@@ -24,11 +19,11 @@ The script depends on the [icalendar package](https://pypi.org/project/icalendar
 Run this command to install it
 
 ```
-pip install icalendar
+pip3 install icalendar
 ```
 or
 ```
-python2 -m pip install icalendar
+python3 -m pip install icalendar
 ```
 
 ## usage
